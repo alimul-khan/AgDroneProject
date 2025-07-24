@@ -1,21 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Ag Project — GCP Live Detection</title>
     <meta http-equiv="refresh" content="5">
-    <title>Random RGB Image</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; }
-        img { max-width: 90%; border: 10px solid #fff; margin-top: 20px; }
-        .info { margin-top: 20px; font-size: 1.2rem; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f1fdf1;
+            color: #2b3e2f;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4caf50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px 40px;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #37663b;
+        }
+
+        button {
+            background-color: #2016b5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e2129d;
+        }
+
+        .info-box {
+            background: #ffffff;
+            padding: 15px 25px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+        }
+
+        .images {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .images img {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 400px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
-    <h1>🎨 Random RGB Image Generator</h1>
-    <img src="/static/output.png" alt="Random Image">
-    <div class="info">
-        <p><strong>RGB:</strong> {{ rgb }}</p>
-        <p><strong>Generated At:</strong> {{ timestamp }}</p>
-    </div>
+    <header>
+        <h1>Ag Project - GCP Placement & Detection</h1>
+        <form method="post" style="margin-top: 10px;">
+            {% if running %}
+                <button type="submit" name="action" value="stop">Stop</button>
+            {% else %}
+                <button type="submit" name="action" value="start">Start</button>
+            {% endif %}
+        </form>
+    </header>
+
+    <main>
+        {% if info %}
+            <div class="info-box">
+                <h2>Latest Detection Info</h2>
+                <p><strong>Scale Factor:</strong> {{ info.scale }}</p>
+                <p><strong>Rotation Angle:</strong> {{ info.angle }}</p>
+                <p><strong>Placed Center:</strong> {{ info.position }}</p>
+                <p><strong>GCP Detected Center:</strong> {{ info.gcp_center }}</p>
+            </div>
+
+            <h2>Image Outputs</h2>
+            <div class="images">
+                <div>
+                    <p><strong>Placed Image:</strong></p>
+                    <img src="/static/AP_getCam.png?{{ info.scale }}">
+                </div>
+                <div>
+                    <p><strong>Filtered Output:</strong></p>
+                    <img src="/static/AP_model_output.png?{{ info.angle }}">
+                </div>
+            </div>
+        {% else %}
+            <p style="margin-top: 20px;">Click <strong>Start</strong> to begin GCP detection in the crop field.</p>
+        {% endif %}
+    </main>
+
+    <footer>
+        Ag Project GCP Detection Interface &mdash; Designed for field-level crop & object detection
+    </footer>
 </body>
 </html>
