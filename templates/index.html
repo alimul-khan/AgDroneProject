@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="5">
+    <title>Random RGB Image</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; }
+        img { max-width: 90%; border: 10px solid #fff; margin-top: 20px; }
+        .info { margin-top: 20px; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Random RGB Image Generator</h1>
+    <img src="/static/output.png" alt="Random Image">
+    <div class="info">
+        <p><strong>RGB:</strong> {{ rgb }}</p>
+        <p><strong>Generated At:</strong> {{ timestamp }}</p>
+    </div>
+</body>
+</html>
