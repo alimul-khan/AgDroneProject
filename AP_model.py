@@ -82,6 +82,6 @@ class AgProjectGCPDetector:
 if __name__ == "__main__":
     detector = AgProjectGCPDetector("AP_getCam.png")
     detector.filter_white_pixels()
-    detector.save_filtered_image("GCPOF_filtered.png")
+    detector.save_filtered_image("AP_model_output.png")
     detector.find_center()
     detector.print_summary()

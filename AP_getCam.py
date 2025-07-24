@@ -43,7 +43,8 @@ class AgProjectGCPPlacer:
 
 # === Example usage ===
 if __name__ == "__main__":
-    placer = AgProjectGCPPlacer("BaseGreenField.png", "gcp_singleRing_fixed_pattern.png")
+    placer = AgProjectGCPPlacer("rPiCameraImage.png", "gcp_singleRing_fixed_pattern.png")
+    # placer = AgProjectGCPPlacer("BaseGreenField.png", "gcp_singleRing_fixed_pattern.png")
     placer.apply_random_transform()
     placer.place_overlay()  # Optional: pass center_x, center_y
     placer.save_result("AP_getCam.png")
