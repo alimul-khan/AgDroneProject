@@ -1,116 +1,137 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ag Project — GCP Live Detection</title>
-    <meta http-equiv="refresh" content="5">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1fdf1;
-            color: #2b3e2f;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #4caf50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        main {
-            padding: 20px 40px;
-        }
-
-        h2 {
-            margin-top: 30px;
-            color: #37663b;
-        }
-
-        button {
-            background-color: #2016b5;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #e2129d;
-        }
-
-        .info-box {
-            background: #ffffff;
-            padding: 15px 25px;
-            margin: 20px 0;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-        }
-
-        .images {
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .images img {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 400px;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #888;
-        }
-    </style>
+  <title>AgLab Camera Dashboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+    .left-panel {
+      flex: 0 0 35%;
+    }
+    .right-panel {
+      flex: 1;
+      overflow-x: auto;
+    }
+    img {
+      width: 100%;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+    a.button {
+      display: inline-block;
+      padding: 8px 12px;
+      background-color: #444;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    a.button:hover {
+      background-color: #222;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Ag Project - GCP Placement & Detection</h1>
-        <form method="post" style="margin-top: 10px;">
-            {% if running %}
-                <button type="submit" name="action" value="stop">Stop</button>
-            {% else %}
-                <button type="submit" name="action" value="start">Start</button>
-            {% endif %}
-        </form>
-    </header>
+  <h1>AgLab Camera Dashboard</h1>
 
-    <main>
-        {% if info %}
-            <div class="info-box">
-                <h2>Latest Detection Info</h2>
-                <p><strong>Scale Factor:</strong> {{ info.scale }}</p>
-                <p><strong>Rotation Angle:</strong> {{ info.angle }}</p>
-                <p><strong>Placed Center:</strong> {{ info.position }}</p>
-                <p><strong>GCP Detected Center:</strong> {{ info.gcp_center }}</p>
-            </div>
+  <p>
+    <a class="button" href="{{ url_for('toggle_capture') }}">
+      {% if capturing %}🛑 Stop Capturing{% else %}🔴 Start Capturing{% endif %}
+    </a>
+  </p>
 
-            <h2>Image Outputs</h2>
-            <div class="images">
-                <div>
-                    <p><strong>Placed Image:</strong></p>
-                    <img src="/static/AP_getCam.png?{{ info.scale }}">
-                </div>
-                <div>
-                    <p><strong>Filtered Output:</strong></p>
-                    <img src="/static/AP_model_output.png?{{ info.angle }}">
-                </div>
-            </div>
-        {% else %}
-            <p style="margin-top: 20px;">Click <strong>Start</strong> to begin GCP detection in the crop field.</p>
-        {% endif %}
-    </main>
+  <div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <h2>Latest Image</h2>
+      <div id="latest-section">
+        <p>No image captured yet.</p>
+      </div>
+    </div>
 
-    <footer>
-        Ag Project GCP Detection Interface &mdash; Designed for field-level crop & object detection
-    </footer>
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <h2>All Captured Image Stats</h2>
+      <table id="all-stats-table">
+        <tr>
+          <th>Image</th><th>Dimensions</th><th>Channels</th>
+          <th>Ch0 Min</th><th>Ch0 Max</th><th>Ch0 Mean</th>
+          <th>Ch1 Min</th><th>Ch1 Max</th><th>Ch1 Mean</th>
+          <th>Ch2 Min</th><th>Ch2 Max</th><th>Ch2 Mean</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function updateDashboard() {
+      fetch('/latest')
+        .then(res => res.json())
+        .then(data => {
+          if (data.image && data.info) {
+            const imgHTML = `<img src="/images/${data.image}?v=${Date.now()}">`;
+            let infoTable = `<table>`;
+            for (const [k, v] of Object.entries(data.info)) {
+              infoTable += `<tr><td><b>${k}</b></td><td>${v}</td></tr>`;
+            }
+            infoTable += `</table>`;
+            document.getElementById('latest-section').innerHTML = imgHTML + infoTable;
+          }
+        });
+
+      fetch('/stats')
+        .then(res => res.json())
+        .then(data => {
+          let rows = `
+            <tr>
+              <th>Image</th><th>Dimensions</th><th>Channels</th>
+              <th>Ch0 Min</th><th>Ch0 Max</th><th>Ch0 Mean</th>
+              <th>Ch1 Min</th><th>Ch1 Max</th><th>Ch1 Mean</th>
+              <th>Ch2 Min</th><th>Ch2 Max</th><th>Ch2 Mean</th>
+            </tr>`;
+          for (const row of data) {
+            rows += `
+              <tr>
+                <td>${row.image_name}</td>
+                <td>${row.dimensions}</td>
+                <td>${row.num_channels}</td>
+                <td>${row.channel_0_min || ''}</td>
+                <td>${row.channel_0_max || ''}</td>
+                <td>${row.channel_0_mean || ''}</td>
+                <td>${row.channel_1_min || ''}</td>
+                <td>${row.channel_1_max || ''}</td>
+                <td>${row.channel_1_mean || ''}</td>
+                <td>${row.channel_2_min || ''}</td>
+                <td>${row.channel_2_max || ''}</td>
+                <td>${row.channel_2_mean || ''}</td>
+              </tr>`;
+          }
+          document.getElementById('all-stats-table').innerHTML = rows;
+        });
+    }
+
+    setInterval(updateDashboard, 5000);
+  </script>
 </body>
 </html>
