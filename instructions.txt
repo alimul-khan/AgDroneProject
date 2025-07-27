@@ -1,0 +1,31 @@
+
+
+
+sudo apt install -y python3-flask
+sudo apt install -y python3-picamera2
+sudo apt install -y python3-opencv
+sudo apt install -y python3-imageio
+
+
+sudo apt update
+sudo apt full-upgrade -y
+
+sudo apt autoremove -y
+sudo apt clean
+
+
+sudo apt install git -y
+
+git config --global user.name "Alimul Khan"
+git config --global user.email "alimul.khan@usask.com"
+git config --list
+
+
+chmod +x /home/alim/AgDroneProject/AgCamApp.py
+sudo nano /etc/systemd/system/AgCamApp.service
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable AgCamApp.service
+sudo systemctl start AgCamApp.service
+sudo systemctl status AgCamApp.service
+sudo systemctl stop AgCamApp.service
