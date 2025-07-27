@@ -1,31 +1,87 @@
+########################################################
+# RASPBERRY PI INITIAL SETUP AND AUTOSTART CONFIG
+########################################################
 
-I am checking the authentications
+# 📌 1. After flashing the OS to microSD (using Raspberry Pi Imager):
+#    Select OS → Set hostname → Enable SSH → Configure Wi-Fi (SSID, password, country)
+#    Set username & password during setup
+
+########################################################
+# 📦 2. UPDATE & UPGRADE THE SYSTEM
+########################################################
+
+sudo apt update
+sudo apt full-upgrade -y
+sudo apt autoremove -y
+sudo apt clean
+
+########################################################
+# 🔧 3. INSTALL GIT AND STORE CREDENTIALS
+########################################################
+
+sudo apt install git -y
+
+# Configure Git
+git config --global user.name "Alimul Khan"
+git config --global user.email "alimul.khan@usask.com"
+git config --global credential.helper store
+git config --list
+
+########################################################
+# 📥 4. CLONE YOUR GITHUB REPO
+########################################################
+
+git clone https://github.com/alimul-khan/AgDroneProject.git
+cd AgDroneProject
+
+########################################################
+# 🧰 5. INSTALL PYTHON LIBRARIES VIA APT (not pip)
+########################################################
 
 sudo apt install -y python3-flask
 sudo apt install -y python3-picamera2
 sudo apt install -y python3-opencv
 sudo apt install -y python3-imageio
 
+########################################################
+# ▶️ 6. TEST YOUR SCRIPT
+########################################################
 
-sudo apt update
-sudo apt full-upgrade -y
+python3 AgCamApp.py
 
-sudo apt autoremove -y
-sudo apt clean
+# If everything works as expected, proceed to autostart.
 
-
-sudo apt install git -y
-
-git config --global user.name "Alimul Khan"
-git config --global user.email "alimul.khan@usask.com"
-git config --list
-
+########################################################
+# 🔁 7. SETUP AUTOSTART WITH SYSTEMD
+########################################################
 
 chmod +x /home/alim/AgDroneProject/AgCamApp.py
+
 sudo nano /etc/systemd/system/AgCamApp.service
+
+# Paste the following content inside the service file:
+# -------------------------
+# [Unit]
+# Description=Real Time Image Processing
+# After=network.target
+
+# [Service]
+# ExecStart=/usr/bin/python3 /home/alim/AgDroneProject/AgCamApp.py
+# Restart=always
+# User=alim
+
+# [Install]
+# WantedBy=multi-user.target
+# -------------------------
+
+# Save and close the file, then run:
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable AgCamApp.service
 sudo systemctl start AgCamApp.service
-sudo systemctl status AgCamApp.service
-sudo systemctl stop AgCamApp.service
+sudo systemctl status AgCamApp.service   # check status
+sudo systemctl stop AgCamApp.service     # stop if needed
+
+########################################################
+# ✅ DONE — YOUR SCRIPT WILL NOW RUN ON BOOT
+########################################################

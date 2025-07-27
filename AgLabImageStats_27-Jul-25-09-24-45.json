@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "image_name": "agLab_27-Jul-25-09-30-04.png",
+    "dimensions": "1080 x 1920",
+    "num_channels": 3,
+    "channel_0_min": 0,
+    "channel_0_max": 216,
+    "channel_0_mean": 77.88,
+    "channel_1_min": 1,
+    "channel_1_max": 222,
+    "channel_1_mean": 86.21,
+    "channel_2_min": 0,
+    "channel_2_max": 202,
+    "channel_2_mean": 76.13
+  },
+  {
+    "image_name": "agLab_27-Jul-25-09-30-12.png",
+    "dimensions": "1080 x 1920",
+    "num_channels": 3,
+    "channel_0_min": 0,
+    "channel_0_max": 191,
+    "channel_0_mean": 59.51,
+    "channel_1_min": 8,
+    "channel_1_max": 172,
+    "channel_1_mean": 58.58,
+    "channel_2_min": 12,
+    "channel_2_max": 202,
+    "channel_2_mean": 68.88
+  },
+  {
+    "image_name": "agLab_27-Jul-25-09-30-17.png",
+    "dimensions": "1080 x 1920",
+    "num_channels": 3,
+    "channel_0_min": 2,
+    "channel_0_max": 233,
+    "channel_0_mean": 79.34,
+    "channel_1_min": 3,
+    "channel_1_max": 251,
+    "channel_1_mean": 91.59,
+    "channel_2_min": 3,
+    "channel_2_max": 237,
+    "channel_2_mean": 77.66
+  },
+  {
+    "image_name": "agLab_27-Jul-25-09-30-23.png",
+    "dimensions": "1080 x 1920",
+    "num_channels": 3,
+    "channel_0_min": 0,
+    "channel_0_max": 235,
+    "channel_0_mean": 80.77,
+    "channel_1_min": 4,
+    "channel_1_max": 251,
+    "channel_1_mean": 90.68,
+    "channel_2_min": 4,
+    "channel_2_max": 238,
+    "channel_2_mean": 78.88
+  }
+]
