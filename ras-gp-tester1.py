@@ -15,11 +15,12 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from ultralytics import YOLO
+import time
 
 # =============================================================================
 # UPDATE THESE PATHS TO YOUR FILES
 # =============================================================================
-IMAGE_PATH = "test1.png"  # Path to your image file
+IMAGE_PATH = "test.png"  # Path to your image file
 MODEL_PATH = "best.pt"  # Path to the YOLO model file
 
 
@@ -75,20 +76,53 @@ def test_gcp_detection(image_path, model_path, channel=2):
         except:
             pass
 
+LOG_FILE = "test.txt"
 
-if __name__ == "__main__":
-    # Check files exist
+def log_to_file(message):
+    with open(LOG_FILE, "a") as f:
+        f.write(message + "\n")
+
+while True:
     if not Path(IMAGE_PATH).exists():
-        print(f"❌ Image file not found: {IMAGE_PATH}")
-        print("   Please update IMAGE_PATH in the script")
+        msg1 = f"❌ Image file not found: {IMAGE_PATH}"
+        msg2 = "   Please update IMAGE_PATH in the script"
+        print(msg1)
+        print(msg2)
+        log_to_file(msg1)
+        log_to_file(msg2)
         exit(1)
 
     if not Path(MODEL_PATH).exists():
-        print(f"❌ Model file not found: {MODEL_PATH}")
-        print("   Please update MODEL_PATH in the script")
+        msg1 = f"❌ Model file not found: {MODEL_PATH}"
+        msg2 = "   Please update MODEL_PATH in the script"
+        print(msg1)
+        print(msg2)
+        log_to_file(msg1)
+        log_to_file(msg2)
         exit(1)
 
-    print(f"Testing GCP detection on: {IMAGE_PATH}")
+    msg = f"Testing GCP detection on: {IMAGE_PATH}"
+    print(msg)
+    log_to_file(msg)
 
-    # Run test
-    test_gcp_detection(IMAGE_PATH, MODEL_PATH)
+    time.sleep(5)
+
+# # if __name__ == "__main__":
+#     # Check files exist
+
+# while True:
+#     if not Path(IMAGE_PATH).exists():
+#         print(f"❌ Image file not found: {IMAGE_PATH}")
+#         print("   Please update IMAGE_PATH in the script")
+#         exit(1)
+
+#     if not Path(MODEL_PATH).exists():
+#         print(f"❌ Model file not found: {MODEL_PATH}")
+#         print("   Please update MODEL_PATH in the script")
+#         exit(1)
+
+#     print(f"Testing GCP detection on: {IMAGE_PATH}")
+
+#     # Run test
+#     test_gcp_detection(IMAGE_PATH, MODEL_PATH)
+#     time.sleep(5)
