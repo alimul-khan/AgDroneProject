@@ -2,7 +2,6 @@ import os
 import time
 import re
 import tempfile
-from datetime import datetime
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -35,7 +34,6 @@ def get_latest_image_number():
 
     return max(numbers) if numbers else 0
 
-
 def load_image(image_path, channel=2):
     arr = np.array(Image.open(image_path))
 
@@ -52,13 +50,6 @@ def load_image(image_path, channel=2):
 
     return np.stack([channel_data] * 3, axis=2)
 
-def log_to_file(image_name, detected):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    result = "Yes" if detected else "No"
-    line = f"[{timestamp}] Image: {image_name} | GCP detected: {result}"
-    with open(LOG_FILE, "a") as f:
-        f.write(line + "\n")
-
 def test_gcp_detection(image_path, model, channel=2):
     image = load_image(image_path, channel)
     temp_path = tempfile.mktemp(suffix=".jpg")
@@ -70,16 +61,22 @@ def test_gcp_detection(image_path, model, channel=2):
             detections = results[0].boxes
 
             if detections is not None and len(detections) > 0:
-                print(f"GCP DETECTED in {Path(image_path).name} with confidence ≥ {conf}")
-                log_to_file(Path(image_path).name, True)
+                message = f"GCP DETECTED in {Path(image_path).name} with confidence ≥ {conf}"
+                print(message)
+                log_to_file(message)
                 return True
 
-        print(f"NO GCP DETECTED in {Path(image_path).name}")
-        log_to_file(Path(image_path).name, False)
+        message = f"NO GCP DETECTED in {Path(image_path).name}"
+        print(message)
+        log_to_file(message)
         return False
 
     finally:
         Path(temp_path).unlink(missing_ok=True)
+
+def log_to_file(message):
+    with open(LOG_FILE, "a") as f:
+        f.write(message + "\n")
 
 # =============================================================================
 # Main Loop
@@ -105,22 +102,12 @@ def main():
     while True:
         filename = f"output{image_counter:04d}.png"
         image_path = os.path.join(OUTPUT_DIR, filename)
-
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Capturing: {image_path}")
         picam2.capture_file(image_path)
-
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Captured: {image_path}")
+        print(f"Captured: {image_path}")
 
         test_gcp_detection(image_path, model)
-
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Processed: {image_path}")
-        print("-" * 40)
         image_counter += 1
         time.sleep(CAPTURE_INTERVAL)
-
 
 if __name__ == "__main__":
     main()

@@ -9,13 +9,21 @@ from PIL import Image
 from ultralytics import YOLO
 from picamera2 import Picamera2
 
+
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
+from datetime import datetime
+
 OUTPUT_DIR = "OutputImages"
 MODEL_PATH = "best.pt"
-LOG_FILE = "test.txt"
-CAPTURE_INTERVAL = 5  # seconds
+
+# Ensure LogFiles directory exists and generate timestamped log filename
+os.makedirs("LogFiles", exist_ok=True)
+timestamp_str = datetime.now().strftime("%d-%b-%y_%H_%M_%S")
+LOG_FILE = f"LogFiles/Log_{timestamp_str}.txt"
+
+CAPTURE_INTERVAL = 1  # seconds
 
 # =============================================================================
 # Helper Functions
@@ -35,7 +43,6 @@ def get_latest_image_number():
 
     return max(numbers) if numbers else 0
 
-
 def load_image(image_path, channel=2):
     arr = np.array(Image.open(image_path))
 
@@ -52,12 +59,16 @@ def load_image(image_path, channel=2):
 
     return np.stack([channel_data] * 3, axis=2)
 
+def append_log(message):
+    with open(LOG_FILE, "a") as f:
+        f.write(message + "\n")
+
 def log_to_file(image_name, detected):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     result = "Yes" if detected else "No"
     line = f"[{timestamp}] Image: {image_name} | GCP detected: {result}"
-    with open(LOG_FILE, "a") as f:
-        f.write(line + "\n")
+    print(line)
+    append_log(line)
 
 def test_gcp_detection(image_path, model, channel=2):
     image = load_image(image_path, channel)
@@ -70,11 +81,9 @@ def test_gcp_detection(image_path, model, channel=2):
             detections = results[0].boxes
 
             if detections is not None and len(detections) > 0:
-                print(f"GCP DETECTED in {Path(image_path).name} with confidence ≥ {conf}")
                 log_to_file(Path(image_path).name, True)
                 return True
 
-        print(f"NO GCP DETECTED in {Path(image_path).name}")
         log_to_file(Path(image_path).name, False)
         return False
 
@@ -107,20 +116,30 @@ def main():
         image_path = os.path.join(OUTPUT_DIR, filename)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Capturing: {image_path}")
+        msg = f"[{timestamp}] Capturing: {image_path}"
+        print(msg)
+        append_log(msg)
+
         picam2.capture_file(image_path)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Captured: {image_path}")
+        msg = f"[{timestamp}] Captured: {image_path}"
+        print(msg)
+        append_log(msg)
 
         test_gcp_detection(image_path, model)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] Processed: {image_path}")
+        msg = f"[{timestamp}] Processed: {image_path}"
+        print(msg)
+        append_log(msg)
+
         print("-" * 40)
+        append_log("-" * 40)
+        append_log("")  # blank line
+
         image_counter += 1
         time.sleep(CAPTURE_INTERVAL)
-
 
 if __name__ == "__main__":
     main()
